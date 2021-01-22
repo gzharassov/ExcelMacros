@@ -1,0 +1,326 @@
+Sub Consolidation()
+#when you see some strange characters, it is not a code, it is just a string, for instance name of the sheet or workbook.   
+    Dim i As Range
+    Dim current_path As String
+    Dim current_company As String
+    Dim wbSource As Workbook
+    Dim wbTarget As Workbook
+    Dim cell As Range
+    Dim cell2 As Range
+    Dim ico As New ArrayList
+    Dim rp As New ArrayList
+    Dim company As String
+    Dim j As Range
+    Dim k As Integer
+    Dim cell3 As Range
+    Dim cell4 As Range
+    Dim cell5 As Range
+    Dim sum_cell As Range
+        
+    Application.ScreenUpdating = False
+    Set wbTarget = ThisWorkbook
+    ThisWorkbook.Sheets("Ñîäåðæàíèå").Select
+    For Each i In Range("C25:C99")
+        current_path = i.Value
+        current_company = i.Offset(0, -1).Value
+        
+        If Not Len(current_path) = 0 Then
+            
+            'Îòêðûòü ôàéë ÏÑÄ
+            Application.AutomationSecurity = msoAutomationSecurityForceDisable
+            Set wbSource = Workbooks.Open(current_path)
+            Application.AutomationSecurity = msoAutomationSecurityByUI
+            
+            'Ñàëüäî íà íà÷àëî ïåðèîäà
+            wbSource.Sheets("ÅÏÑ").Range("D14:D122").Copy
+            
+            wbTarget.Activate
+            Set cell = Sheets("Êîíñîëèäàöèÿ_01012020").Rows(9).Find(current_company, SearchOrder:=xlRows)
+            If Not cell Is Nothing Then
+                Set cell2 = cell.Offset(3, 0)
+                Sheets("Êîíñîëèäàöèÿ_01012020").Select
+                cell2.Select
+                ActiveCell.PasteSpecial xlPasteValues
+            End If
+            
+            'Ñàëüäî íà êîíåö ïåðèîäà
+            wbSource.Sheets("ÅÏÑ").Range("E14:E122").Copy
+            
+            wbTarget.Activate
+            Set cell = Sheets("Êîíñîëèäàöèÿ_30092020").Rows(9).Find(current_company, SearchOrder:=xlRows)
+            If Not cell Is Nothing Then
+                Set cell2 = cell.Offset(3, 0)
+                Sheets("Êîíñîëèäàöèÿ_30092020").Select
+                cell2.Select
+                ActiveCell.PasteSpecial xlPasteValues
+            End If
+                
+            'Ñîîòíåñòè êîìïàíèè ïî ÂÃÎ è RP
+            wbTarget.Sheets("Ñïèñîê ñâÿçàííûõ ñòîðîí").Select
+            
+            For Each j In Range("D10:D74")
+                If j.Offset(0, 3).Value = "ICo" Then
+                    ico.Add j.Value
+                ElseIf j.Offset(0, 3).Value = "RP" Then
+                    rp.Add j.Value
+                End If
+            Next
+            
+            'Ñàëüäî íà íà÷àëî ïåðèîäà ICO
+            Column = "="
+            wbSource.Activate
+            wbSource.Sheets("ÅÏÑ").Select
+            For k = 0 To ico.Count - 1
+                company = ico(k)
+                Set cell3 = Sheets("ÅÏÑ").Range("F11:CB11").Find(company, SearchOrder:=xlRows)
+                If Not cell3 Is Nothing Then
+                    Column = Column & Split(cell3(1).Address(1, 0), "$")(0) & "14" & "+"
+                End If
+            Next
+            Column = Left(Column, Len(Column) - 1)
+            Range("FF14:FF122").Formula = Column
+            Range("FF14:FF122").Copy
+            
+            wbTarget.Activate
+            Set cell4 = Sheets("ÂÃÎ_01012020").Rows(9).Find(current_company, SearchOrder:=xlRows)
+            If Not cell4 Is Nothing Then
+                Set cell5 = cell4.Offset(3, 0)
+                Sheets("ÂÃÎ_01012020").Select
+                cell5.Select
+                ActiveCell.PasteSpecial xlPasteValues
+            End If
+            
+            'Ñàëüäî íà êîíåö ïåðèîäà ICO
+            Column = "="
+            wbSource.Activate
+            wbSource.Sheets("ÅÏÑ").Select
+            For k = 0 To ico.Count - 1
+                company = ico(k)
+                Set cell3 = Sheets("ÅÏÑ").Range("CC11:EY11").Find(company, SearchOrder:=xlRows)
+                If Not cell3 Is Nothing Then
+                    Column = Column & Split(cell3(1).Address(1, 0), "$")(0) & "14" & "+"
+                End If
+            Next
+            Column = Left(Column, Len(Column) - 1)
+            Range("FF14:FF122").Formula = Column
+            Range("FF14:FF122").Copy
+            
+            wbTarget.Activate
+            Set cell4 = Sheets("ÂÃÎ_30092020").Rows(9).Find(current_company, SearchOrder:=xlRows)
+            If Not cell4 Is Nothing Then
+                Set cell5 = cell4.Offset(3, 0)
+                Sheets("ÂÃÎ_30092020").Select
+                cell5.Select
+                ActiveCell.PasteSpecial xlPasteValues
+            End If
+            
+            'Ñàëüäî íà íà÷àëî ïåðèîäà RP
+            Column = "="
+            wbSource.Activate
+            wbSource.Sheets("ÅÏÑ").Select
+            For k = 0 To rp.Count - 1
+                company = rp(k)
+                Set cell3 = Sheets("ÅÏÑ").Range("F11:CB11").Find(company, SearchOrder:=xlRows)
+                If Not cell3 Is Nothing Then
+                    Column = Column & Split(cell3(1).Address(1, 0), "$")(0) & "14" & "+"
+                End If
+            Next
+            Column = Left(Column, Len(Column) - 1)
+            Range("FF14:FF122").Formula = Column
+            Range("FF14:FF122").Copy
+            
+            wbTarget.Activate
+            Set cell4 = Sheets("RP_01012020").Rows(9).Find(current_company, SearchOrder:=xlRows)
+            If Not cell4 Is Nothing Then
+                Set cell5 = cell4.Offset(3, 0)
+                Sheets("RP_01012020").Select
+                cell5.Select
+                ActiveCell.PasteSpecial xlPasteValues
+            End If
+            
+            'Ñàëüäî íà êîíåö ïåðèîäà RP
+            Column = "="
+            wbSource.Activate
+            wbSource.Sheets("ÅÏÑ").Select
+            For k = 0 To rp.Count - 1
+                company = rp(k)
+                Set cell3 = Sheets("ÅÏÑ").Range("CC11:EY11").Find(company, SearchOrder:=xlRows)
+                If Not cell3 Is Nothing Then
+                    Column = Column & Split(cell3(1).Address(1, 0), "$")(0) & "14" & "+"
+                End If
+            Next
+            Column = Left(Column, Len(Column) - 1)
+            Range("FF14:FF122").Formula = Column
+            Range("FF14:FF122").Copy
+            
+            wbTarget.Activate
+            Set cell4 = Sheets("RP_30092020").Rows(9).Find(current_company, SearchOrder:=xlRows)
+            If Not cell4 Is Nothing Then
+                Set cell5 = cell4.Offset(3, 0)
+                Sheets("RP_30092020").Select
+                cell5.Select
+                ActiveCell.PasteSpecial xlPasteValues
+            End If
+            
+            'Ñàëüäî íà êîíåö ïåðèîäà ICO (Îò÷åò î ôèíàíñîâûõ ðåçóëüòàòàõ)
+            Column = "="
+            wbSource.Activate
+            wbSource.Sheets("ÅÏÑ").Select
+            For k = 0 To ico.Count - 1
+                company = ico(k)
+                Set cell3 = Sheets("ÅÏÑ").Range("F125:CB125").Find(company, SearchOrder:=xlRows)
+                If Not cell3 Is Nothing Then
+                    Column = Column & Split(cell3(1).Address(1, 0), "$")(0) & "127" & "+"
+                End If
+            Next
+            Column = Left(Column, Len(Column) - 1)
+            Range("D127:D152").Formula = Column
+            Range("D127:D152").Copy
+            
+            wbTarget.Activate
+            Set cell4 = Sheets("ÂÃÎ_30092020").Rows(9).Find(current_company, SearchOrder:=xlRows)
+            If Not cell4 Is Nothing Then
+                Set cell5 = cell4.Offset(114, 0)
+                Sheets("ÂÃÎ_30092020").Select
+                cell5.Select
+                ActiveCell.PasteSpecial xlPasteValues
+            End If
+            
+            'Ñàëüäî íà êîíåö ïåðèîäà RP (Îò÷åò î ôèíàíñîâûõ ðåçóëüòàòàõ)
+            Column = "="
+            wbSource.Activate
+            wbSource.Sheets("ÅÏÑ").Select
+            For k = 0 To rp.Count - 1
+                company = rp(k)
+                Set cell3 = Sheets("ÅÏÑ").Range("F125:CB125").Find(company, SearchOrder:=xlRows)
+                If Not cell3 Is Nothing Then
+                    Column = Column & Split(cell3(1).Address(1, 0), "$")(0) & "127" & "+"
+                End If
+            Next
+            Column = Left(Column, Len(Column) - 1)
+            Range("D127:D152").Formula = Column
+            Range("D127:D152").Copy
+            
+            wbTarget.Activate
+            Set cell4 = Sheets("RP_30092020").Rows(9).Find(current_company, SearchOrder:=xlRows)
+            If Not cell4 Is Nothing Then
+                Set cell5 = cell4.Offset(114, 0)
+                Sheets("RP_30092020").Select
+                cell5.Select
+                ActiveCell.PasteSpecial xlPasteValues
+            End If
+            
+            'Ïðèõîä
+            wbSource.Activate
+            wbSource.Sheets("Ô3").Select
+            
+            Range("CB13:CB73").Copy
+            wbTarget.Activate
+            Sheets("Êîíñîëèäàöèÿ_ÎÄÄÑ_30092020").Select
+            Set cell4 = Sheets("Êîíñîëèäàöèÿ_ÎÄÄÑ_30092020").Range("A9:CA9").Find(current_company, SearchOrder:=xlRows)
+            If Not cell4 Is Nothing Then
+                Set cell5 = cell4.Offset(2, 0)
+                Sheets("Êîíñîëèäàöèÿ_ÎÄÄÑ_30092020").Select
+                cell5.Select
+                ActiveCell.PasteSpecial xlPasteValues
+            End If
+            
+            'Ðàñõîä
+            wbSource.Activate
+            wbSource.Sheets("Ô3").Select
+            
+            Range("FA13:FA73").Copy
+            wbTarget.Activate
+            Sheets("Êîíñîëèäàöèÿ_ÎÄÄÑ_30092020").Select
+            Set cell4 = Sheets("Êîíñîëèäàöèÿ_ÎÄÄÑ_30092020").Range("CA9:EZ9").Find(current_company, SearchOrder:=xlRows)
+            If Not cell4 Is Nothing Then
+                Set cell5 = cell4.Offset(2, 0)
+                Sheets("Êîíñîëèäàöèÿ_ÎÄÄÑ_30092020").Select
+                cell5.Select
+                ActiveCell.PasteSpecial xlPasteValues
+            End If
+            
+            'Ïðèõîä ÂÃÎ_CF
+            wbSource.Activate
+            wbSource.Sheets("Ô3").Select
+            
+            Column = "="
+            For k = 0 To ico.Count - 1
+                company = ico(k)
+                Set cell3 = Sheets("Ô3").Range("D11:CB11").Find(company, SearchOrder:=xlRows)
+                If Not cell3 Is Nothing Then
+                    Column = Column & Split(cell3(1).Address(1, 0), "$")(0) & "14" & "+"
+                End If
+            Next
+            Column = Left(Column, Len(Column) - 1)
+            Range("FC14:FC73").Formula = Column
+            Range("FC14:FC73").Copy
+            
+            wbTarget.Activate
+            Set cell4 = Sheets("CF_ÂÃÎ").Range("B5:BZ5").Find(current_company, SearchOrder:=xlRows)
+            If Not cell4 Is Nothing Then
+                Set cell5 = cell4.Offset(3, 0)
+                Sheets("CF_ÂÃÎ").Select
+                cell5.Select
+                ActiveCell.PasteSpecial xlPasteValues
+            End If
+            
+            'Ðàñõîä ÂÃÎ_CF
+            wbSource.Activate
+            wbSource.Sheets("Ô3").Select
+            
+            Column = "="
+            For k = 0 To ico.Count - 1
+                company = ico(k)
+                Set cell3 = Sheets("Ô3").Range("CB11:FA11").Find(company, SearchOrder:=xlRows)
+                If Not cell3 Is Nothing Then
+                    Column = Column & Split(cell3(1).Address(1, 0), "$")(0) & "14" & "+"
+                End If
+            Next
+            Column = Left(Column, Len(Column) - 1)
+            Range("FC14:FC73").Formula = Column
+            Range("FC14:FC73").Copy
+            
+            wbTarget.Activate
+            Set cell4 = Sheets("CF_ÂÃÎ").Range("BZ5:EX5").Find(current_company, SearchOrder:=xlRows)
+            If Not cell4 Is Nothing Then
+                Set cell5 = cell4.Offset(3, 0)
+                Sheets("CF_ÂÃÎ").Select
+                cell5.Select
+                ActiveCell.PasteSpecial xlPasteValues
+            End If
+            
+            'Ïðèáûëü è óáûòêè çà îò÷¸òíûé ïåðèîä
+            wbSource.Activate
+            wbSource.Sheets("ÅÏÑ").Select
+            
+            Range("E127:E152").Copy
+            
+            wbTarget.Activate
+            Sheets("Êîíñîëèäàöèÿ_ÎÔÐ_30092020").Select
+            Set cell4 = Sheets("Êîíñîëèäàöèÿ_ÎÔÐ_30092020").Rows(8).Find(current_company, SearchOrder:=xlRows)
+            If Not cell4 Is Nothing Then
+                Set cell5 = cell4.Offset(2, 0)
+                Sheets("Êîíñîëèäàöèÿ_ÎÔÐ_30092020").Select
+                cell5.Select
+                ActiveCell.PasteSpecial xlPasteValues
+            End If
+            
+            'Ñóììà Ô4
+            wbSource.Activate
+            wbSource.Sheets("Ô4").Select
+            
+            Range("C14:I47").Copy
+            
+            wbTarget.Activate
+            Sheets("Êîíñîëèäàöèÿ_Ô4_30092020").Select
+            Range("B5").Select
+            ActiveCell.PasteSpecial xlPasteValues, xlPasteSpecialOperationAdd
+            
+        'Çàêðûòü ôàéë
+        Application.CutCopyMode = False
+        wbSource.Close Savechanges = False
+        End If
+    Next
+End Sub
+
